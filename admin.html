@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - College Event Management</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('kes.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8); 
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1, h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            margin: 15px 0;
+            padding: 12px 20px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        .delete-button {
+            color: white;
+            background-color: red;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .section {
+            margin-top: 40px;
+        }
+        .your-class{
+            width: 570px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add Event</h1>
+        <form id="event-form">
+            <input type="text" class="your-class" id="event-name" placeholder="Event Name" required>
+            <input type="date" class="your-class" id="event-date" required>
+            <input type="time" class="your-class" id="start-time" required>
+            <input type="time" class="your-class" id="end-time" required>
+            <select id="event-category" required>
+                <option value="" disabled selected>Select Event Category</option>
+                <option value="Workshop">Workshop</option>
+                <option value="Seminar">Seminar</option>
+                <option value="Cultural Event">Cultural Event</option>
+                <option value="Sports">Sports</option>
+                <option value="Guest Lecture">Guest Lecture</option>
+            </select>
+            <button type="submit">Add Event</button>
+        </form>
+
+        <h2>Manage Events</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Date</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="event-list">
+                <!-- Event rows will be dynamically added here -->
+            </tbody>
+        </table>
+
+        <!-- Section for Registrations -->
+        <div class="section">
+            <h2>Registrations</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Event Name</th>
+                        <th>User Name</th>
+                        <th>Roll Number</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="registration-list">
+                    <!-- Registrations will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section for Feedback -->
+        <div class="section">
+            <h2>Feedback</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Event Name</th>
+                        <th>Feedback</th>
+                    </tr>
+                </thead>
+                <tbody id="feedback-list">
+                    <!-- Feedback will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+
+        <button onclick="window.location.href='index.html'">Back to Home</button>
+    </div>
+
+    <script>
+        const events = JSON.parse(localStorage.getItem('events')) || [];
+        const registrations = JSON.parse(localStorage.getItem('registrations')) || [];
+        const feedbacks = JSON.parse(localStorage.getItem('feedbacks')) || [];
+
+        function populateEventList() {
+            const eventList = document.getElementById('event-list');
+            eventList.innerHTML = '';
+            events.forEach((event, index) => {
+                eventList.innerHTML += `
+                    <tr>
+                        <td>${event.name}</td>
+                        <td>${event.date}</td>
+                        <td>${event.startTime}</td>
+                        <td>${event.endTime}</td>
+                        <td><button class="delete-button" onclick="deleteEvent(${index})">Delete</button></td>
+                    </tr>`;
+            });
+        }
+
+        function populateRegistrationList() {
+            const registrationList = document.getElementById('registration-list');
+            registrationList.innerHTML = '';
+            registrations.forEach((registration, index) => {
+                registrationList.innerHTML += `
+                    <tr>
+                        <td>${registration.event}</td>
+                        <td>${registration.name}</td>
+                        <td>${registration.rollNo}</td>
+                        <td><button class="delete-button" onclick="deleteRegistration(${index})">Delete</button></td>
+                    </tr>`;
+            });
+        }
+
+        function populateFeedbackList() {
+            const feedbackList = document.getElementById('feedback-list');
+            feedbackList.innerHTML = '';
+            feedbacks.forEach((feedback, index) => {
+                feedbackList.innerHTML += `
+                    <tr>
+                        <td>${feedback.event}</td>
+                        <td>${feedback.feedback}</td>
+                    </tr>`;
+            });
+        }
+
+        function deleteEvent(index) {
+            events.splice(index, 1);
+            localStorage.setItem('events', JSON.stringify(events));
+            populateEventList();
+        }
+
+        function deleteRegistration(index) {
+            registrations.splice(index, 1);
+            localStorage.setItem('registrations', JSON.stringify(registrations));
+            populateRegistrationList();
+        }
+
+        document.getElementById('event-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const eventName = document.getElementById('event-name').value;
+            const eventDate = document.getElementById('event-date').value;
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+            const eventCategory = document.getElementById('event-category').value;
+
+            if (eventName && eventDate && startTime && endTime && eventCategory) {
+                events.push({
+                    name: eventName,
+                    date: eventDate,
+                    startTime: startTime,
+                    endTime: endTime,
+                    category: eventCategory
+                });
+                localStorage.setItem('events', JSON.stringify(events));
+                populateEventList();
+                this.reset();
+            } else {
+                alert('Please fill in all fields.');
+            }
+        });
+
+        populateEventList();
+        populateRegistrationList();
+        populateFeedbackList();
+    </script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User - College Event Management</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('kes.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .container {
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8); 
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            margin: 15px 0;
+            padding: 12px 20px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .your-class{
+            width: 570px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Register for Events</h1>
+        <form id="register-event-form">
+            <select id="select-event" required>
+                <option value="" disabled selected>Select an Event</option>
+            </select>
+            <input type="text" class="your-class" id="your-name" placeholder="Your Name" required>
+            <input type="text" class="your-class" id="roll-no" placeholder="Roll Number:-example:SYBCA034B" required>
+            <button type="submit">Register</button>
+        </form>
+        
+        <h2>Give Feedback</h2>
+        <form id="feedback-form">
+            <select id="feedback-event" required>
+                <option value="" disabled selected>Select an Event for Feedback</option>
+            </select>
+            <textarea id="feedback-text" class="your-class" placeholder="Your Feedback" required></textarea>
+            <button type="submit">Submit Feedback</button>
+        </form>
+        
+        <button onclick="window.location.href='index.html'">Back to Home</button>
+    </div>
+
+    <script>
+        const events = JSON.parse(localStorage.getItem('events')) || [];
+        const registrations = JSON.parse(localStorage.getItem('registrations')) || [];
+        const feedbacks = JSON.parse(localStorage.getItem('feedbacks')) || [];
+
+        function populateEventDropdowns() {
+            const eventSelectElement = document.getElementById('select-event');
+            const feedbackEventSelectElement = document.getElementById('feedback-event');
+
+            eventSelectElement.innerHTML = '<option value="" disabled selected>Select an Event</option>';
+            feedbackEventSelectElement.innerHTML = '<option value="" disabled selected>Select an Event for Feedback</option>';
+
+            events.forEach((event, index) => {
+                const option = `<option value="${index}">${event.name} (from ${event.startTime} to ${event.endTime})</option>`;
+                eventSelectElement.innerHTML += option;
+                feedbackEventSelectElement.innerHTML += option;
+            });
+        }
+
+        // Initialize dropdowns on page load
+        populateEventDropdowns();
+
+        // Handle event registration
+        document.getElementById('register-event-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const selectedEventIndex = document.getElementById('select-event').value;
+            const userName = document.getElementById('your-name').value;
+            const rollNo = document.getElementById('roll-no').value;
+
+            if (selectedEventIndex && userName && rollNo) {
+                registrations.push({
+                    name: userName,
+                    rollNo: rollNo,
+                    event: events[selectedEventIndex].name
+                });
+                localStorage.setItem('registrations', JSON.stringify(registrations));
+
+                alert(`Registered for "${events[selectedEventIndex].name}" successfully.`);
+                this.reset();
+            } else {
+                alert('Please fill all fields to register for an event.');
+            }
+        });
+
+        // Handle feedback submission
+        document.getElementById('feedback-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const selectedEventIndex = document.getElementById('feedback-event').value;
+            const feedbackText = document.getElementById('feedback-text').value;
+
+            if (selectedEventIndex && feedbackText) {
+                feedbacks.push({
+                    event: events[selectedEventIndex].name,
+                    feedback: feedbackText
+                });
+                localStorage.setItem('feedbacks', JSON.stringify(feedbacks));
+
+                alert(`Feedback for "${events[selectedEventIndex].name}" submitted successfully.`);
+                this.reset();
+            } else {
+                alert('Please fill all fields to submit feedback.');
+            }
+        });
+    </script>
+</body>
+</html>
